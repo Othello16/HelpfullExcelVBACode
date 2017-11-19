@@ -1,0 +1,378 @@
+'Random Form/Module snippets 
+
+
+Sheet1.Visible = xlVeryHidden
+Application.ScreenUpdating = False
+Unload Me
+DProfileInfoBioScreen.Show vbModeless
+ThisWorkbook.Sheets("CODESOURCE").Range("AQ2").Value = 0
+
+
+---------------------------------------------------
+'For Loop Example
+
+    z = LastRow("IN_GAME_DATA", "B")
+    For X = 2 To z
+        If IN_GAME_DATA.Range("B" & X).Value = CurrentPlayer Then
+        currentplayerID = IN_GAME_DATA.Range("A" & X).Value
+        End If
+    Next X
+    
+--------------------------------------------------------------
+
+'If Statement example with use of excel random function
+
+'START Determine 50/50 chance of 1-on-1 card or solo
+    Pl = Application.RandBetween(1, 2)
+    If Pl = 1 Then
+    GoTo enter1on1play
+    Else
+    GoTo entersoloplay
+    End If
+'END Determine 50/50 chance of 1-on-1 card or solo card
+
+
+---------------------------------------------------
+
+
+Private Sub UserForm_Initialize()
+With Me
+  .StartUpPosition = 0
+  .Left = Application.Left + (0.5 * Application.Width) - (0.5 * .Width)
+  .Top = Application.Top + (0.5 * Application.Height) - (0.5 * .Height)
+End With
+ThisWorkbook.Sheets("CODESOURCE").Range("Q2").Value = "DPROFILEINFOBIOSCREEN"
+Call PlayItLoginScreen
+End Sub
+
+RatePlayersH1Img.Visible = True
+RatePlayersH2Img.Visible = False
+
+------------------------------------------------------------------
+'Function to get lastrow
+
+Function LastRow(ByVal ShNam As String, ByVal ActCol As String) As Integer
+
+    LastRow = ThisWorkbook.Sheets(ShNam).Range(ActCol & Columns(ActCol).Rows.Count).End(xlUp).Row
+    
+    If LastRow > 30000 Then
+    
+    LastRow = ThisWorkbook.Sheets(ShNam).Cells(1, ActCol).SpecialCells(xlCellTypeVisible).End(xlDown).Row
+    
+    End If
+    
+    'LastRow( "IN_GAME_DATA", "G")
+    
+End Function
+
+
+-----------------------------------------------
+
+
+'While Loop with if statement
+    X = 2
+    Do While GLOBAL_P2P_RATINGS.Cells(X, 1) <> ""
+        If GLOBAL_P2P_RATINGS.Cells(X, 1) = PrimaryPlayerID Then
+            
+        AvgRelationship = AvgRelationship + GLOBAL_P2P_RATINGS.Cells(X, 8)
+        
+        Y = X
+
+            If GLOBAL_P2P_RATINGS.Cells(Y, 2) = SecondaryPlayerID Then
+                        
+                Relationship = GLOBAL_P2P_RATINGS.Cells(Y, 8)
+ 
+            End If
+        
+        End If
+
+    X = X + 1
+    Loop
+    
+    ------------------------------------------------------------------------
+    'Select Case Example
+    
+    
+    Select Case Attraction
+
+    Case 1
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.6
+        Else
+        CardTypeValue = CardTypeValue + 0.5
+        End If
+        
+    Case 2
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.5
+        Else
+        CardTypeValue = CardTypeValue + 0.4
+        End If
+        
+    Case 3
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.4
+        Else
+        CardTypeValue = CardTypeValue + 0.3
+        End If
+        
+    Case 4
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.4
+        Else
+        CardTypeValue = CardTypeValue + 0.3
+        End If
+        
+    Case 5
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.3
+        Else
+        CardTypeValue = CardTypeValue + 0.2
+        End If
+        
+    Case 6
+        If AvgAttraction >= Attraction Then
+        CardTypeValue = CardTypeValue + 0.2
+        Else
+        CardTypeValue = CardTypeValue + 0.2
+        End If
+        
+    
+End Select
+
+
+---------------------------------------------------------------
+'Open Web Browser
+
+
+'Option Explicit
+
+'Private Declare Function ShellExecute _
+ ' Lib "shell32.dll" Alias "ShellExecuteA" ( _
+  'ByVal hWnd As Long, _
+  'ByVal Operation As String, _
+  'ByVal Filename As String, _
+  'Optional ByVal Parameters As String, _
+  'Optional ByVal Directory As String, _
+  'Optional ByVal WindowStyle As Long = vbMinimizedFocus _
+  ') As Long
+
+Public Sub OpenUrlsoundagenten()
+
+    Dim lSuccess As Long
+    lSuccess = ShellExecute(0, "Open", "www.soundagenten.com")
+
+End Sub
+
+Public Sub OpenUrlgetplayedapp()
+
+    Dim lSuccess As Long
+    lSuccess = ShellExecute(0, "Open", "www.getplayedapp.com")
+
+End Sub
+
+---------------------------------------------------------------------
+'Play Music (*Windows Only; will not work in Excel for Mac)
+
+'Option Explicit
+'Public Declare Function sndPlaySound32 _
+ '   Lib "winmm.dll" _
+ '   Alias "sndPlaySoundA" ( _
+ '       ByVal lpszSoundName As String, _
+ '       ByVal uFlags As Long) As Long
+'not in use due to using wmplayer instead
+Sub PlayTheSound(ByVal WhatSound As String)
+'    If Dir(WhatSound, vbNormal) = "" Then
+'        ' WhatSound is not a file. Get the file named by
+'        ' WhatSound from the Windows\Media directory.
+'        WhatSound = ThisWorkbook.Path & "\Audio\" & WhatSound
+'        If InStr(1, WhatSound, ".") = 0 Then
+'            ' if WhatSound does not have a .wav extension,
+'            ' add one.
+'            WhatSound = WhatSound & ".wav"
+'        End If
+'
+'        If Dir(WhatSound, vbNormal) = vbNullString Then
+'            Beep            ' Can't find the file. Do a simple Beep.
+'            Exit Sub
+'
+'        End If
+'    Else
+'        ' WhatSound is a file. Use it.
+'    End If
+'
+'    sndPlaySound32 WhatSound, 0&    ' Finally, play the sound.
+
+End Sub
+
+Sub PlayItOnOpen()
+
+'Dim WMP As Object
+'Dim oShell As Object
+ 
+'Set WMP = CreateObject("new:{6BF52A52-394A-11d3-B153-00C04F79FAA6}")
+'WMP.OpenPlayer ThisWorkbook.Path & "\Audio\v6_1.wmv"
+'Set oShell = CreateObject("WScript.Shell")
+'oShell.SendKeys "% n"
+'oShell.SendKeys "% m"
+
+
+End Sub
+
+
+Sub PlayItLoginScreen()
+
+'Dim WMP As Object
+'Dim songselect As Byte
+'Dim oShell As Object
+
+'songselect = Int((7 - 1 + 1) * Rnd + 1)
+ 
+'identify windows media player
+'Set WMP = CreateObject("new:{6BF52A52-394A-11d3-B153-00C04F79FAA6}")
+'select the song to play
+'WMP.OpenPlayer ThisWorkbook.Path & "\Audio\Song" & songselect & "_1.wmv"
+'keep wmp in the background
+'Set oShell = CreateObject("WScript.Shell")
+'oShell.SendKeys "% n"
+'auto hide move close box option
+'oShell.SendKeys "% m"
+         
+
+End Sub
+
+Sub PlayItStartGame()
+
+'Dim WMP As Object
+'Dim songselect As Byte
+'Dim oShell As Object
+
+'generate random number between 1 and 7 to pic which song goes next
+'songselect = Int((7 - 1 + 1) * Rnd + 1)
+ 
+'identify windows media player
+'Set WMP = CreateObject("new:{6BF52A52-394A-11d3-B153-00C04F79FAA6}")
+'randomly select song to play
+'WMP.OpenPlayer ThisWorkbook.Path & "\Audio\9gameStart.wmv"
+'pre for use of hot keys
+'Set oShell = CreateObject("WScript.Shell")
+'keep wmp in the background
+'oShell.SendKeys "% n"
+'auto hide move close box option
+'oShell.SendKeys "% m"
+          
+
+End Sub
+
+Sub efx1()
+
+PlayTheSound "1.WAV"
+'small achievement
+
+End Sub
+
+
+
+-------------------------------------------------------------
+'Old IRIS Code
+
+Private Sub IndividualAcctTransaction() ' When pressing Deposit/Withdrawl adds or subtract acct transactions
+'to both the capital and Current Balance. Not to be used with trade subs
+
+Application.ScreenUpdating = False
+Sheets("AccountHolders").Visible = True
+
+Sheets("AccountHolders").Select
+
+X = 2
+Y = 2
+
+Dim AcctHolder As String
+Dim eRow
+
+Dim ReportTwo As Worksheet 'Set up your new worksheet variable.
+Set ReportTwo = Excel.ActiveSheet 'Assign the active sheet to the variable.
+
+AcctHolder = [AHInput]
+
+
+'Deposits
+
+If [depOrWith] = "Deposit" Then
+
+Application.Calculation = xlManual
+Do While Cells(X, 3) <> ""
+If Cells(X, 3) = AcctHolder Then
+[NewBalance].Copy
+Worksheets("AccountHolders").Cells(X, 4).PasteSpecial Paste:=xlPasteValues
+'ReportTwo.Cells(x, 5).Value = Excel.WorksheetFunction.Sum(Report.Cells(18, 6), Cells(x, 4))
+End If
+X = X + 1
+Loop
+
+Do While Cells(Y, 3) <> ""
+If Cells(Y, 3) = AcctHolder Then
+ReportTwo.Cells(Y, 5).Value = Excel.WorksheetFunction.Sum(ReportTwo.Cells(18, 6), Cells(Y, 5))
+End If
+Y = Y + 1
+Loop
+Application.Calculation = xlAutomatic
+
+Sheets("TransactionEntry").Visible = True
+
+Sheets("TransactionEntry").Select
+
+Call copyTransactionToRecord
+
+Call eraseAcctEntryData
+
+MsgBox "Deposit Complete"
+
+Sheets("TransactionEntry").Visible = False
+
+Else 'For withdrawls
+
+If [AvailForWithdrawl] > 0 And [DepWithAmt] <= 0 And [Account_Balance] >= [AvailForWithdrawl] And ([DepWithAmt] * -1) <= [AvailForWithdrawl] Then
+
+Do While Cells(X, 3) <> ""
+
+If Cells(X, 3) = AcctHolder Then
+[NewBalance].Copy
+Worksheets("AccountHolders").Cells(X, 4).PasteSpecial Paste:=xlPasteValues
+End If
+X = X + 1
+Loop
+
+Do While Cells(Y, 3) <> ""
+If Cells(Y, 3) = AcctHolder Then
+ReportTwo.Cells(Y, 5).Value = Excel.WorksheetFunction.Sum(ReportTwo.Cells(18, 6), Cells(Y, 5))
+End If
+Y = Y + 1
+Loop
+Application.Calculation = xlAutomatic
+
+Sheets("TransactionEntry").Visible = True
+
+Sheets("TransactionEntry").Select
+
+Call copyTransactionToRecord
+
+Call eraseAcctEntryData
+
+MsgBox "Withdrawl Complete"
+
+Else
+
+MsgBox "Withdrawl Amount Exceeds Available Funds"
+
+Sheets("TransactionEntry").Visible = False
+End If
+
+End If
+
+Sheets("AccountDepWit").Select
+    Sheets("AccountHolders").Visible = False
+End Sub
+
+
+    
