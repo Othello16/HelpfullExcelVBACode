@@ -1,0 +1,791 @@
+Sub BioScreenCode()
+
+'Transfers all the info from registering a new account to the REGISTERED_PLAYERS screem
+
+
+Application.ScreenUpdating = False
+'ThisWorkbook.Sheets("REGISTERED_PLAYERS").Visible = True
+
+Dim X As Integer
+Dim Y As Integer
+Dim z As Integer    'used to count number of players to add a new player at the bottom of players in the IN_GAME_DATA sheet
+Dim aa As Integer 'used to determine if the user name already exsist
+Dim BB As Integer
+Dim UserName As String
+Dim REGISTERED_PLAYERS As Worksheet
+Dim IN_GAME_DATA As Worksheet
+Dim CODESOURCE As Worksheet
+Dim FirstName As String
+Dim LastName As String
+Dim GENDER As String
+Dim eMail As String
+Dim PassWord As String
+Dim ConfirmPassWord As String
+Dim Weight As Double
+Dim MetricVsImperial As Boolean
+Dim HeightinFeet As Double
+Dim HeightinInches As Double
+Dim HeightinCentimeters As Double
+Dim RelationshipStatus As String
+Dim SexualPreference As String
+Dim LastR As Integer
+Dim SavedAvatar As String
+Dim UpdateUserName As String
+Dim Height As Double
+Dim answer As String
+
+
+Set REGISTERED_PLAYERS = ThisWorkbook.Sheets("REGISTERED_PLAYERS")
+Set CODESOURCE = ThisWorkbook.Sheets("CODESOURCE")
+Set IN_GAME_DATA = ThisWorkbook.Sheets("IN_GAME_DATA")
+
+'On Error Resume Next
+
+X = 3
+LastName = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioScreenLNameTxt.Value))
+FirstName = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioScreenNameTxt.Value))
+GENDER = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioScreenGenderCmb.Value))
+UserName = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioUserNameTxt.Value))
+eMail = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioEmailTxt.Value))
+PassWord = Trim(DProfileInfoBioScreen.DProfileInfoBioPasswordTxt.Value)
+ConfirmPassWord = Trim(DProfileInfoBioScreen.DProfileInfoBioConPassTxt.Value)
+Weight = Trim(DProfileInfoBioScreen.DProfileInfoBioWeightTxt.Value)
+LastR = zGPLDFunctions.LastRow("REGISTERED_PLAYERS", "A")
+
+
+If DProfileInfoBioScreen.DProfileInfoBioImperialMetricImg.Visible = True Then 'metric
+    MetricVsImperial = True 'Metric
+    Else
+    MetricVsImperial = False 'Imperial
+End If
+
+HeightinFeet = Trim(DProfileInfoBioScreen.DProfileInfoBioHeightFtTxt.Value)
+HeightinInches = Trim(DProfileInfoBioScreen.DProfileInfoBioHeightInInTxt.Value)
+If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = True Then
+HeightinCentimeters = Trim(DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Value)
+Else
+HeightinCentimeters = ((HeightinFeet * 12) + HeightinInches) * 2.54
+End If
+RelationshipStatus = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioRelStatusCmb.Value))
+SexualPreference = Trim(UCase(DProfileInfoBioScreen.DProfileInfoBioPreferenceCbm.Value))
+UpdateUserName = CODESOURCE.Range("P2").Value
+
+If DProfileInfoBioScreen.DProfileInfoBioImperialMetricImg.Visible = True Then
+    HeightinCentimeters = ((HeightinFeet * 12) + HeightinInches) / 2.54
+    Else
+    Height = HeightinCentimeters
+End If
+
+'check to see if the email address or user name already exsist
+'check all the name to make sure there is no match. if it clears go to the next step
+'if it does inform them that the user name and password is taken
+
+
+'GoTo testing
+
+
+
+'first check to see if this is an update in which case the values for that user will be refreshed and bypass
+'checking for an exsisting username or email address
+If ThisWorkbook.Sheets("CODESOURCE").Range("R2").Value = "YES" Then
+    ThisWorkbook.Sheets("CODESOURCE").Range("R2").ClearContents
+    GoTo AddNewPlayer       '------------------------   ADD NEW PLAYER-------------------------
+End If
+
+
+If ThisWorkbook.Sheets("CODESOURCE").Range("O2").Value = "YES" Then
+    'ThisWorkbook.Sheets("CODESOURCE").Range("O2").ClearContents
+    'ThisWorkbook.Sheets("CODESOURCE").Range("AO2").Value = True
+    GoTo RefreshUserFormForUpdate       '------------------------    PRE REFRESH CHECK -------------------------
+End If
+
+     '------------------------    POST REFRESH ENTRY  -------------------------
+If ThisWorkbook.Sheets("CODESOURCE").Range("O2").Value = "COMPLETE" Then
+    ThisWorkbook.Sheets("CODESOURCE").Range("O2").ClearContents
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 2) <> ""
+If REGISTERED_PLAYERS.Cells(X, 2) = UpdateUserName Then
+
+    'Check Password then Add PASSWORD if they match else exit sub
+    If PassWord = ConfirmPassWord Then
+        REGISTERED_PLAYERS.Cells(X, 5).Value = PassWord
+    Else
+        MsgBox "Your passwords do not match. Please re-enter them and try again."
+        CODESOURCE.Range("AO2").Value = False
+        Exit Sub
+    End If
+    
+    Y = 2
+    'Update USER_NAME
+    REGISTERED_PLAYERS.Cells(X, Y) = UserName
+    Y = Y + 1
+    'Add GIVEN_NAME
+    REGISTERED_PLAYERS.Cells(X, Y) = FirstName & " " & LastName
+    Y = Y + 1
+    'Add EMAIL
+    REGISTERED_PLAYERS.Cells(X, Y).Value = eMail
+    Y = Y + 2 ' skipping over password
+    
+    'Add GENDER
+        REGISTERED_PLAYERS.Cells(X, Y).Value = GENDER
+        Y = Y + 1
+    'Add Orientation
+        REGISTERED_PLAYERS.Cells(X, Y).Value = SexualPreference
+        Y = Y + 1
+    'Add Status
+        REGISTERED_PLAYERS.Cells(X, Y).Value = RelationshipStatus
+        Y = Y + 1
+    'Add WEIGHT
+    If MetricVsImperial = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = Weight
+        Y = Y + 1
+    Else
+        REGISTERED_PLAYERS.Cells(X, Y).Value = Weight * 0.453592
+        Y = Y + 1
+    End If
+    'Add HeightinCM using height in CM or Feet and Inches
+    If MetricVsImperial = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = HeightinCentimeters
+        Y = Y + 1
+    Else
+        REGISTERED_PLAYERS.Cells(X, Y).Value = ((HeightinFeet * 12) + HeightinInches) * 2.54
+        Y = Y + 1
+    End If
+    'Add BMI
+    If MetricVsImperial = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = Application.Round((Weight) / (HeightinCentimeters * HeightinCentimeters), 0)  '* 0.453592
+        Y = Y + 27
+    Else
+        REGISTERED_PLAYERS.Cells(X, Y).Value = Application.Round((Weight * 0.45) / ((0.025 * ((HeightinFeet * 12) + HeightinInches)) * (0.025 * ((HeightinFeet * 12) + HeightinInches))), 0)
+        Y = Y + 27
+    End If
+    
+    'enter first name alone
+    REGISTERED_PLAYERS.Cells(X, Y).Value = FirstName
+    Y = Y + 1
+    'enter Last name alone
+        REGISTERED_PLAYERS.Cells(X, Y).Value = LastName
+        Y = Y + 1
+    'did the user use metric or imperial?
+    If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "METRIC"
+        Y = Y + 3
+    Else
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "IMPERIAL"
+        Y = Y + 1
+    End If
+    
+    'fill in how tall in feet if the user prefers imperial
+    If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = False Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = HeightinFeet
+        Y = Y + 1
+    End If
+    
+    'fill in how tall in inches if the user prefers imperial
+    If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = False Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = HeightinInches
+        Y = Y + 1
+    End If
+    
+    
+    'set chosen Avatar
+    If DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarErica.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarErica"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarJustus.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarJustus"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarNico.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarNico"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarSho.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarSho"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarTroy.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarTroy"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarYuki.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarYuki"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarAnna.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnna"
+        ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarNikki.Visible = True Then
+        REGISTERED_PLAYERS.Cells(X, Y).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarNikki"
+    End If
+        
+    CODESOURCE.Range("P2").Value = UserName
+    CODESOURCE.Range("AH2").Value = REGISTERED_PLAYERS.Cells(X, 1).Value
+    
+    Exit Sub
+
+End If
+X = X + 1
+Loop
+
+
+End If
+     '------------------------    POST REFRESH COMPLETE -------------------------
+
+    '-------------------------------- ADD NEW PROFILE -------------------------------
+AddNewPlayer:
+'user name
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 2) <> ""
+If REGISTERED_PLAYERS.Cells(X, 2) = UserName Then
+    MsgBox "User Name taken, please try another User Name"
+    CODESOURCE.Range("AO2").Value = False
+    Exit Sub
+End If
+X = X + 1
+Loop
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 4) <> ""
+    If REGISTERED_PLAYERS.Cells(X, 4) = eMail Then
+    MsgBox "E-mail address taken, please try another e-mail address"
+    CODESOURCE.Range("AO2").Value = False
+    Exit Sub
+End If
+X = X + 1
+Loop
+
+skipemail:
+
+'Check Password then Add PASSWORD if they match else exit sub
+If PassWord = ConfirmPassWord Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, 5).Value = PassWord
+Else
+    MsgBox "Your passwords do not match. Please re-enter them and try again."
+    CODESOURCE.Range("AO2").Value = False
+    Exit Sub
+End If
+
+
+X = 0 'Column
+'if user name and emial not already being used add all user info to REGISTERED_PLAYERS
+'Create USER_ID
+If ThisWorkbook.Sheets("REGISTERED_PLAYERS").Range("A3").Value = "" Then
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = 1
+Else
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = REGISTERED_PLAYERS.Cells(LastR, X + 1).Value + 1
+End If
+X = X + 1
+'Add USER_NAME
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = UserName
+X = X + 1
+'Add GIVEN_NAME
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = FirstName & " " & LastName
+X = X + 1
+'Add EMAIL
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = eMail
+X = X + 2 ' skipping over password
+
+'Add GENDER
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = GENDER
+    X = X + 1
+'Add Orientation
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = SexualPreference
+    X = X + 1
+'Add Status
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = RelationshipStatus
+    X = X + 1
+'Add WEIGHT
+If MetricVsImperial = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = Weight
+    X = X + 1
+Else
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = Weight * 0.453592
+    X = X + 1
+End If
+'Add HeightinCM using height in CM or Feet and Inches
+If MetricVsImperial = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = HeightinCentimeters
+    X = X + 1
+Else
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = ((HeightinFeet * 12) + HeightinInches) * 2.54
+    X = X + 1
+End If
+'Add BMI
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = Application.Round((((Weight * 0.453592) / (HeightinCentimeters * HeightinCentimeters)) * 10000), 2)
+    X = X + 1
+'enter first name alone
+REGISTERED_PLAYERS.Cells(LastR + 1, X + 27).Value = FirstName
+X = X + 27
+'enter Last name alone
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = LastName
+    X = X + 1
+'did the user use metric or imperial?
+If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "METRIC"
+    X = X + 1
+Else
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "IMPERIAL"
+    X = X + 1
+End If
+
+'fill in how tall in feet if the user prefers imperial
+If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = False Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = HeightinFeet
+    X = X + 1
+End If
+
+'fill in how tall in inches if the user prefers imperial
+If DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = False Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = HeightinInches
+    X = X + 1
+End If
+
+'set chosen Avatar
+If DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarErica.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarErica"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarJustus.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarJustus"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarNico.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarNico"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarSho.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarSho"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarTroy.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarTroy"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarYuki.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarYuki"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarAnna.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnna"
+    ElseIf DProfileInfoBioScreen.DProfileInfoBioAvatarNikki.Visible = True Then
+    REGISTERED_PLAYERS.Cells(LastR + 1, X + 1).Value = "DProfileInfoBioScreen.DProfileInfoBioAvatarNikki"
+End If
+
+
+'BMI
+'REGISTERED_PLAYERS.Cells(LastR + 1, 11).Value = 24
+
+'USER_MAX_LEVEL
+If REGISTERED_PLAYERS.Cells(LastR + 1, 13).Value = "" Then
+REGISTERED_PLAYERS.Cells(LastR + 1, 13).Value = "FRIENDLY"
+End If
+
+
+'Avg Ounces a game
+REGISTERED_PLAYERS.Cells(LastR + 1, 14).Value = Application.RandBetween(1, 20)
+
+'avg_Bac
+REGISTERED_PLAYERS.Cells(LastR + 1, 15).Value = 0.06
+
+'Target BAC
+REGISTERED_PLAYERS.Cells(LastR + 1, 16).Value = 0.06
+
+'avg game duration
+REGISTERED_PLAYERS.Cells(LastR + 1, 17).Value = Application.RandBetween(30, 120)
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 21).Value = Application.RandBetween(1, 120)
+
+'most drinks in one night
+REGISTERED_PLAYERS.Cells(LastR + 1, 22).Value = Application.RandBetween(1, 15)
+
+'drinking this game
+'REGISTERED_PLAYERS.Cells(LastR + 1, 23).Value = True
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 24).Value = Application.RandBetween(1, 5)
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 25).Value = Application.RandBetween(1, 5)
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 26).Value = Application.RandBetween(1, 5)
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 27).Value = Application.RandBetween(1, 5)
+
+'avgtime till 1st reported drink
+REGISTERED_PLAYERS.Cells(LastR + 1, 28).Value = Application.RandBetween(1, 5)
+
+
+'set as in game add (guest)
+REGISTERED_PLAYERS.Cells(LastR + 1, 45).Value = "YES"
+
+'set Credits
+REGISTERED_PLAYERS.Cells(LastR + 1, 70).Value = Application.Round(Application.RandBetween(100, 1000), 3)
+
+'game total score
+REGISTERED_PLAYERS.Cells(LastR + 1, 72).Value = Application.Round(Application.RandBetween(1000, 3000), 3)
+
+'time between reported drinks
+REGISTERED_PLAYERS.Cells(LastR + 1, 73).Value = Application.Round(Application.RandBetween(100, 900), 3)
+
+'time between reported drinks
+REGISTERED_PLAYERS.Cells(LastR + 1, 74).Value = 1
+
+Call AddPlayerRelationship
+
+
+'----------------------------------------------- ADD THE NEW PLAYER TO THE GAME ROOM --------------------------------------------
+'Find an empty row and add user info to IN_GAME_DATA sheet
+
+'if the player does not already exsist in the line up
+X = 2
+Do While IN_GAME_DATA.Cells(X, 1) <> ""
+    If IN_GAME_DATA.Cells(X, 2) <> REGISTERED_PLAYERS.Cells(LastR + 1, 2) Then
+    aa = aa + 1
+    End If 'Paid by moving stars
+X = X + 1
+Loop
+
+
+'find empty row
+X = 1
+Do While IN_GAME_DATA.Cells(X, 1) <> ""
+    If IN_GAME_DATA.Cells(X, 1) <> "" Then
+    z = z + 1
+    End If
+X = X + 1
+Loop
+
+'sets all new data to below the last row
+z = z + 1
+
+X = LastRow("REGISTERED_PLAYERS", "A")
+
+If (aa >= 1) And (z <= 9) Then
+
+'USER_ID (1) to (1)
+IN_GAME_DATA.Cells(z, 1) = REGISTERED_PLAYERS.Cells(X, 1)
+'USER_NAME (2) to (2)
+IN_GAME_DATA.Cells(z, 2) = REGISTERED_PLAYERS.Cells(X, 2)
+'GIVEN_NAME (3) to (3)
+IN_GAME_DATA.Cells(z, 3) = REGISTERED_PLAYERS.Cells(X, 3)
+'EMAIL (4) to (146)
+IN_GAME_DATA.Cells(z, 146) = REGISTERED_PLAYERS.Cells(X, 4)
+'GENDER (6) to (4)
+IN_GAME_DATA.Cells(z, 4) = REGISTERED_PLAYERS.Cells(X, 6)
+'ORIENTATION (7) to (5)
+IN_GAME_DATA.Cells(z, 5) = REGISTERED_PLAYERS.Cells(X, 7)
+'STATUS (8) to (6)
+IN_GAME_DATA.Cells(z, 6) = REGISTERED_PLAYERS.Cells(X, 8)
+'WEIGHT_KG (9) to (7)
+IN_GAME_DATA.Cells(z, 7) = REGISTERED_PLAYERS.Cells(X, 9)
+'HEIGHT_CM (10) to (8)
+IN_GAME_DATA.Cells(z, 8) = REGISTERED_PLAYERS.Cells(X, 10)
+'Partner ID
+IN_GAME_DATA.Cells(z, 9) = REGISTERED_PLAYERS.Cells(X, 12)
+'Significant other present false default
+IN_GAME_DATA.Cells(z, 10) = False
+'Change Significant other to true if applicable
+BB = 1
+Do While IN_GAME_DATA.Cells(BB, 1) <> ""
+    If IN_GAME_DATA.Cells(BB, 1) = IN_GAME_DATA.Cells(z, 12) Then
+    'Significant other present
+    IN_GAME_DATA.Cells(z, 10) = True
+    End If
+BB = BB + 1
+Loop
+'AVG_TIME_BETWEEN_REPORTED_DRINKS
+IN_GAME_DATA.Cells(z, 11) = REGISTERED_PLAYERS.Cells(X, 73)
+'AVG_TIME_BETWEEN_REPORTED_DRINKS
+IN_GAME_DATA.Cells(z, 11) = REGISTERED_PLAYERS.Cells(X, 73)
+'Target BAC
+IN_GAME_DATA.Cells(z, 18) = REGISTERED_PLAYERS.Cells(X, 16)
+'Drinking This Game
+            answer = MsgBox("Is this player drinking this game?", vbYesNo + vbQuestion, "Drinking or Nah?")
+            If answer = vbYes Then
+                IN_GAME_DATA.Cells(z, 22) = True
+            Else
+                IN_GAME_DATA.Cells(z, 22) = False
+            End If
+'AVG_OUNCES_A_GAME
+IN_GAME_DATA.Cells(z, 24) = REGISTERED_PLAYERS.Cells(X, 14)
+'AVG_END_GAME_BAC
+IN_GAME_DATA.Cells(z, 25) = REGISTERED_PLAYERS.Cells(X, 15)
+'MOST_DRINKS_IN_ONE_NIGHT
+IN_GAME_DATA.Cells(z, 26) = REGISTERED_PLAYERS.Cells(X, 22)
+
+'MOST_DRINKS_IN_ONE_NIGHT
+IN_GAME_DATA.Cells(z, 26) = REGISTERED_PLAYERS.Cells(X, 22)
+
+'AVG_BEER_GAME
+IN_GAME_DATA.Cells(z, 116) = REGISTERED_PLAYERS.Cells(X, 29)
+'AVG_wINE_GAME
+IN_GAME_DATA.Cells(z, 117) = REGISTERED_PLAYERS.Cells(X, 30)
+'AVG_mIXED_GAME
+IN_GAME_DATA.Cells(z, 118) = REGISTERED_PLAYERS.Cells(X, 31)
+'AVG_hl_GAME
+IN_GAME_DATA.Cells(z, 119) = REGISTERED_PLAYERS.Cells(X, 32)
+'AVG_SHOTS_GAME
+IN_GAME_DATA.Cells(z, 120) = REGISTERED_PLAYERS.Cells(X, 33)
+
+
+
+
+'Drinks sweet or strong
+IN_GAME_DATA.Cells(z, 41) = REGISTERED_PLAYERS.Cells(X, 44)
+
+
+
+'BMI (11) to (23)
+IN_GAME_DATA.Cells(z, 23) = REGISTERED_PLAYERS.Cells(X, 11)
+'Level
+IN_GAME_DATA.Cells(z, 42) = REGISTERED_PLAYERS.Cells(X, 13)
+'FIRST_NAME (38) to (120)
+
+'Credit on Hand
+IN_GAME_DATA.Cells(z, 79) = REGISTERED_PLAYERS.Cells(X, 70)
+
+'Level
+IN_GAME_DATA.Cells(z, 80) = REGISTERED_PLAYERS.Cells(X, 13)
+
+'tapped in
+IN_GAME_DATA.Cells(z, 91) = True
+
+'GLOBAL_SCORE
+IN_GAME_DATA.Cells(z, 93) = REGISTERED_PLAYERS.Cells(X, 72)
+
+'TOP_GLOBAL_SCORE (N/A)
+lrow = LastRow("REGISTERED_PLAYERS", "BT")
+Application.Max (REGISTERED_PLAYERS.Range("BT3:BT" & lrow))
+
+'Drinks Sweet or Strong
+IN_GAME_DATA.Cells(z, 98) = REGISTERED_PLAYERS.Cells(X, 44)
+
+'AVG_TIME_TILL_FIRST_REPORTED_DRINK_SEC
+IN_GAME_DATA.Cells(z, 103) = REGISTERED_PLAYERS.Cells(X, 21)
+
+'email
+IN_GAME_DATA.Cells(z, 108) = REGISTERED_PLAYERS.Cells(X, 4)
+'password
+IN_GAME_DATA.Cells(z, 109) = REGISTERED_PLAYERS.Cells(X, 5)
+'avg_game_duration_mins
+IN_GAME_DATA.Cells(z, 110) = REGISTERED_PLAYERS.Cells(X, 17)
+'Beer Rating
+IN_GAME_DATA.Cells(z, 111) = REGISTERED_PLAYERS.Cells(X, 24)
+'Wine Rating
+IN_GAME_DATA.Cells(z, 112) = REGISTERED_PLAYERS.Cells(X, 25)
+'Mixed Rating
+IN_GAME_DATA.Cells(z, 113) = REGISTERED_PLAYERS.Cells(X, 26)
+'HL Rating
+IN_GAME_DATA.Cells(z, 114) = REGISTERED_PLAYERS.Cells(X, 27)
+'Shots Rating
+IN_GAME_DATA.Cells(z, 115) = REGISTERED_PLAYERS.Cells(X, 28)
+
+'first name
+IN_GAME_DATA.Cells(z, 121) = REGISTERED_PLAYERS.Cells(X, 38)
+'LAST_NAME (39) to (121)
+IN_GAME_DATA.Cells(z, 122) = REGISTERED_PLAYERS.Cells(X, 39)
+'METRIC_IMPERIAL (40) to (122)
+IN_GAME_DATA.Cells(z, 123) = REGISTERED_PLAYERS.Cells(X, 40)
+'HEIGHT_FT (41) to (123)
+IN_GAME_DATA.Cells(z, 124) = REGISTERED_PLAYERS.Cells(X, 41)
+'HEIGHT_IN (42) to (124)
+IN_GAME_DATA.Cells(z, 125) = REGISTERED_PLAYERS.Cells(X, 42)
+'CURRENT_AVATAR (43) to (125)
+IN_GAME_DATA.Cells(z, 126) = REGISTERED_PLAYERS.Cells(X, 43)
+'In Device Add
+IN_GAME_DATA.Cells(z, 127) = REGISTERED_PLAYERS.Cells(X, 45)
+
+
+
+'add new player as current user if they joined from the login screen, else add them as Them
+'into the next avaiable player slot
+If ThisWorkbook.Sheets("CODESOURCE").Range("T2").Value = "YES" Then
+ThisWorkbook.Sheets("CODESOURCE").Range("P2").Value = IN_GAME_DATA.Cells(z, 2)
+End If
+
+End If
+
+
+
+
+CODESOURCE.Range("P2").Value = UserName
+CODESOURCE.Range("AH2").Value = IN_GAME_DATA.Cells(z, 1)
+'******Start here after refresh***********
+
+
+
+Exit Sub
+
+'-----------------------------end add new profile -------------------------------------------
+
+
+'--------------------------------------   REFRESH   -------------------------------
+
+RefreshUserFormForUpdate:
+'CODESOURCE.Range("P2").Value = UserName
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 2) <> ""
+If REGISTERED_PLAYERS.Cells(X, 40) = "METRIC" Then
+    DProfileInfoBioScreen.DProfileInfoBioImperialImg.Visible = False
+    DProfileInfoBioScreen.DProfileInfoBioImperialMetricImg.Visible = True
+    DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = True
+    'DProfileInfoBioScreen.DProfileInfoBioHeightBkgrndImg.Visible = True
+Exit Do
+End If
+X = X + 1
+Loop
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 2) <> ""
+If REGISTERED_PLAYERS.Cells(X, 2) = UpdateUserName Then
+    'fill in bio form data
+    DProfileInfoBioScreen.DProfileInfoBioUserNameTxt.Value = REGISTERED_PLAYERS.Cells(X, 2).Value
+    'refresh email
+    DProfileInfoBioScreen.DProfileInfoBioEmailTxt.Value = REGISTERED_PLAYERS.Cells(X, 4).Value
+    'refresh passwords
+    DProfileInfoBioScreen.DProfileInfoBioPasswordTxt.Value = REGISTERED_PLAYERS.Cells(X, 5).Value
+    DProfileInfoBioScreen.DProfileInfoBioConPassTxt.Value = REGISTERED_PLAYERS.Cells(X, 5).Value
+    'refresh gender
+    DProfileInfoBioScreen.DProfileInfoBioScreenGenderCmb.Value = REGISTERED_PLAYERS.Cells(X, 6).Value
+    'refresh preference
+    DProfileInfoBioScreen.DProfileInfoBioPreferenceCbm.Value = REGISTERED_PLAYERS.Cells(X, 7).Value
+    'refresh status
+    DProfileInfoBioScreen.DProfileInfoBioRelStatusCmb.Value = REGISTERED_PLAYERS.Cells(X, 8).Value
+        
+        'refresh weight
+        If REGISTERED_PLAYERS.Cells(X, 40) = "METRIC" Then
+            Weight = Int(REGISTERED_PLAYERS.Cells(X, 9))
+            DProfileInfoBioScreen.DProfileInfoBioWeightTxt.Value = Weight
+            DProfileInfoBioScreen.DProfileInfoBioScreenlbskgbl.Caption = "Kg"
+            DProfileInfoBioScreen.DProfileInfoBioScreenCMLbl.Visible = True
+            DProfileInfoBioScreen.DProfileInfoBioImperialMetricImg.Visible = True
+            
+        Else
+            Weight = Int(REGISTERED_PLAYERS.Cells(X, 9) * 2.20462)
+            DProfileInfoBioScreen.DProfileInfoBioWeightTxt.Value = Application.Round(Weight, 0)
+            DProfileInfoBioScreen.DProfileInfoBioScreenlbskgbl.Caption = "lbs"
+            DProfileInfoBioScreen.DProfileInfoBioScreenCMLbl.Visible = False
+            DProfileInfoBioScreen.DProfileInfoBioImperialMetricImg.Visible = False
+        End If
+        
+        'refresh height
+        If REGISTERED_PLAYERS.Cells(X, 40) = "IMPERIAL" Then
+            DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = False
+            'DProfileInfoBioScreen.DProfileInfoBioHeightBkgrndImg.Visible = False
+            DProfileInfoBioScreen.DProfileInfoBioHeightFtTxt.Value = REGISTERED_PLAYERS.Cells(X, 41).Value
+            DProfileInfoBioScreen.DProfileInfoBioHeightInInTxt.Value = REGISTERED_PLAYERS.Cells(X, 42).Value
+            DProfileInfoBioScreen.DProfileInfoBioScreenftLbl.Visible = True
+            DProfileInfoBioScreen.DProfileInfoBioScreeninLbl.Visible = True
+        Else
+            DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Visible = True
+            'DProfileInfoBioScreen.DProfileInfoBioHeightBkgrndImg.Visible = True
+            DProfileInfoBioScreen.DProfileInfoBioHeightMetricImg.Value = Int(REGISTERED_PLAYERS.Cells(X, 10).Value)
+            DProfileInfoBioScreen.DProfileInfoBioScreenftLbl.Visible = False
+            DProfileInfoBioScreen.DProfileInfoBioScreeninLbl.Visible = False
+        End If
+    
+    DProfileInfoBioScreen.DProfileInfoBioScreenNameTxt.Value = REGISTERED_PLAYERS.Cells(X, 38).Value
+    DProfileInfoBioScreen.DProfileInfoBioScreenLNameTxt.Value = REGISTERED_PLAYERS.Cells(X, 39)
+    
+    'hide default avatar
+    DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa.Visible = False
+    
+    SavedAvatar = REGISTERED_PLAYERS.Cells(X, 43).Value
+    
+    
+    If SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarAnnissa.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarAsianChick.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarJustus" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarJustus.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarNico" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarNico.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarSalliePooh.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarSho" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarSho.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarTroy" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarTroy.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarWhiteGuy.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarYuki" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarYuki.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarErica" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarErica.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarAnna" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarAnna.Visible = True
+        ElseIf SavedAvatar = "DProfileInfoBioScreen.DProfileInfoBioAvatarNikki" Then
+        DProfileInfoBioScreen.DProfileInfoBioAvatarNikki.Visible = True
+    End If
+Exit Do
+End If
+
+
+X = X + 1
+Loop
+
+ThisWorkbook.Sheets("CODESOURCE").Range("O2").Value = "COMPLETE"
+End Sub
+
+
+Sub ListPartners()
+
+Dim lrow As Integer
+
+'find last row of names
+lrow = LastRow("RegisteredPlayers", "B")
+
+VIdentifyPartner.VIdentifyPartnerCBO.SOURCE = ThisWorkbook.Sheets("Registered_Players").Range("B2:B" & lrow)
+
+End Sub
+
+
+Sub addSOrelationship()
+
+'the user can just add who their Significant Other (SO) is and vice versa
+Dim CurrentUser As String
+Dim CurrentUserID As Integer
+Dim SOName As String
+Dim SOID As Integer
+Dim lrow As Integer
+
+Dim REGISTERED_PLAYERS As Worksheet
+Set REGISTERED_PLAYERS = ThisWorkbook.Sheets("REGISTERED_PLAYERS")
+
+
+lrow = LastRow("REGISTERED_PLAYERS", "B")
+
+SOName = VIdentifyPartner.VIdentifyPartnerCBO.Value
+
+CurrentUser = ThisWorkbook.Sheets("CODESOURCE").Range("P2").Value
+
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 1) <> ""
+    If REGISTERED_PLAYERS.Cells(X, 2) = CurrentUser Then
+        CurrentUserID = REGISTERED_PLAYERS.Cells(X, 1)
+        Exit Do
+    End If
+X = X + 1
+Loop
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 1) <> ""
+    If REGISTERED_PLAYERS.Cells(X, 2) = SOName Then
+        SOID = REGISTERED_PLAYERS.Cells(X, 1)
+        REGISTERED_PLAYERS.Cells(X, 12) = CurrentUserID
+        Exit Do
+    End If
+X = X + 1
+Loop
+
+X = 3
+Do While REGISTERED_PLAYERS.Cells(X, 1) <> ""
+    If REGISTERED_PLAYERS.Cells(X, 1) = CurrentUserID Then
+        REGISTERED_PLAYERS.Cells(X, 12) = SOID
+        Exit Do
+    End If
+X = X + 1
+Loop
+
+
+
+End Sub
