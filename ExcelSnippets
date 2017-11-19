@@ -6,8 +6,27 @@ Application.ScreenUpdating = False
 Unload Me
 DProfileInfoBioScreen.Show vbModeless
 ThisWorkbook.Sheets("CODESOURCE").Range("AQ2").Value = 0
+'Use colon to place mulitple lines on one line of code
+[symbolA2].Value = MyTool.MultiPage1.Pages(Page1).pg1Sym2Cmb: MyTool.MultiPage1.Pages(Page1).pg1SymLbl2 = [symbolA2]
+ActiveWorkbook.Connections("Connection1").Delete
+Application.Run "FormData.updateSymbolA1"
+MyTool.MultiPage1.Page2.pg2prolop6.Caption = ""
 
+---------------------------------------------------------------------------
+'Formatting
 
+'Format Percent
+If lastr >= 4 Then
+[proloP3] = ([exitprice3] / [entryprice3] - 1)
+MyTool.MultiPage1.Page2.pg2prolop3.Caption = [proloP3].Value
+MyTool.MultiPage1.Page2.pg2prolop3.Caption = _
+Format(MyTool.MultiPage1.Page2.pg2prolop3.Caption, "#0.00%;[Red]-#.00%")
+End If
+
+'Format Dollars
+MyTool.MultiPage1.Page2.pg2proloD1.Caption = [plDR1].Value
+MyTool.MultiPage1.Page2.pg2proloD1.Caption = _
+Format(MyTool.MultiPage1.Page2.pg2proloD1.Caption, "$#0.00;[Red]-$#0.00")
 ---------------------------------------------------
 'For Loop Example
 
@@ -372,6 +391,16 @@ End If
 
 Sheets("AccountDepWit").Select
     Sheets("AccountHolders").Visible = False
+End Sub
+
+--------------------------------------------------------------------------------
+-MultiSheet Forms
+
+Private Sub UpdateExitDate()
+'update the following:
+[exitdate] = MyTool.MultiPage1.Page2.pg2ExitDateTxt: MyTool.MultiPage1.Page2.pg2ExitDateTxt = [exitdate]
+MyTool.MultiPage1.Page2.pg2ExitDateTxt.Value = _
+Format(MyTool.MultiPage1.Page2.pg2ExitDateTxt.Value, "mm/dd/yyyy")
 End Sub
 
 
