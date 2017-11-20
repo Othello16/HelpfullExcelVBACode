@@ -12,6 +12,31 @@ ActiveWorkbook.Connections("Connection1").Delete
 Application.Run "FormData.updateSymbolA1"
 MyTool.MultiPage1.Page2.pg2prolop6.Caption = ""
 Set IN_GAME_DATA = ThisWorkbook.Sheets("IN_GAME_DATA")
+Date() ' date in excel vba
+WorksheetFunction.Sum(100,200)
+Excel.Application
+
+-----------------------------------------------------------------------------
+
+Dim xlApp As Excel.Application
+Dim x, y As Integer
+
+Set xlApp = New Excel.Application
+x = ActiveDocument.ContentControls(1).Range.Text
+y = ActiveDocument.ContentControls(2).Range.Text
+
+ActiveDocument.ContentControls(3).Range.Text = _
+    xlApp.WorksheetFunction.Sum(x, y)
+
+-----------------------------------------------------------------------------------
+Sub CleanUpData()
+    ' Trims irregular spacing, and corrects capitalization.
+    Dim objCell As Range
+    For Each objCell In ActiveCell.CurrentRegion
+        objCell = WorksheetFunction.Trim(objCell)
+        objCell = WorksheetFunction.Proper(objCell)
+    Next objCell
+End Sub
 
 ---------------------------------------------------------------------------
 'Formatting
