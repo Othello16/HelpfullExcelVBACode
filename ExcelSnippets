@@ -403,5 +403,26 @@ MyTool.MultiPage1.Page2.pg2ExitDateTxt.Value = _
 Format(MyTool.MultiPage1.Page2.pg2ExitDateTxt.Value, "mm/dd/yyyy")
 End Sub
 
+--------------------------------------
+
+
+Dim lrow As Integer
+
+lrow = LastRow("DailyLog", "A")
+
+
+'Not From a refresh
+ThisWorkbook.Sheets("DailyLog").Cells(2, 3).Value = LogForm.PIEntry.Text
+
+
+
+'Is From a refresh
+'If it's not a refresh, and it's not
+
+
+'For now unlaod, but in the future, clear the form after saving everyhting
+Unload LogForm
+
+
 
     
