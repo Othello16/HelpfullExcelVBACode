@@ -11,6 +11,7 @@ ThisWorkbook.Sheets("CODESOURCE").Range("AQ2").Value = 0
 ActiveWorkbook.Connections("Connection1").Delete
 Application.Run "FormData.updateSymbolA1"
 MyTool.MultiPage1.Page2.pg2prolop6.Caption = ""
+Set IN_GAME_DATA = ThisWorkbook.Sheets("IN_GAME_DATA")
 
 ---------------------------------------------------------------------------
 'Formatting
